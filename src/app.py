@@ -1,15 +1,34 @@
-from flask import Flask, request, jsonify
+import os
+from flask import Flask, request, jsonify, render_template
 from utils.finance_utils import compute_savings_growth
 from simulator.monte_carlo import run_monte_carlo
 from recommender.rules import recommend_products
 # from db.mongo_client import get_db  # optional, can be commented out
 
-app = Flask(__name__)  # <-- this line MUST come before @app.route
+# Initialize Flask app with static and template folders
+app = Flask(
+    __name__,
+    template_folder=os.path.join(os.path.dirname(__file__), 'templates'),
+    static_folder=os.path.join(os.path.dirname(__file__), 'static')
+)
 
+# -------------------------
+# Frontend Route
+# -------------------------
+@app.route("/")
+def index():
+    return render_template("index.html")
+
+# -------------------------
+# Health Check
+# -------------------------
 @app.route("/health", methods=["GET"])
 def health():
     return jsonify({"status": "ok"})
 
+# -------------------------
+# Main Simulation API
+# -------------------------
 @app.route("/simulate", methods=["POST"])
 def simulate():
     data = request.json
@@ -31,7 +50,7 @@ def simulate():
         n_sims=500
     )
 
-    # Temporarily disable MongoDB to prevent 500 errors
+    # Mongo temporarily disabled
     # db = get_db()
     # db.simulations.insert_one({
     #     "input": data,
@@ -45,8 +64,15 @@ def simulate():
         "recommendations": recs
     })
 
+# -------------------------
+# Run Server
+# -------------------------
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=8080)
+    app.run(host="0.0.0.0", port=8000)
+
+
+
+
 
 
 
