@@ -11,7 +11,7 @@ COPY .env.example .env
 # Fix Python import path
 ENV PYTHONPATH=/app
 
-EXPOSE 8080
+EXPOSE 8000
 
 CMD ["python", "src/app.py"]
 
